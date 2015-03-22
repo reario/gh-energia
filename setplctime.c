@@ -120,7 +120,10 @@ Esempio:
     setval(mb,76,ptr->tm_sec );
     setval(mb,77,ptr->tm_hour*100+ptr->tm_min ); /* ore:minuti es. 1252: ore 12 e 52 minuti*/
     printf("ora:minuti->%d\n",ptr->tm_hour*100+ptr->tm_min);
-    /* commit */
+    /* commit: on the rising edge it set %S50 and time is equal to the content of %MW76 and %MW77. With %S50=1 time is updatable. 
+       On the falling edge it reset %S50. With %S50=0 time is no more updatable  
+       Reset of %MW95 is done on PLC so is not necessary to set it to 0 here. This is why here we are only setting %M95 to TRUE. 
+    */
     setsinglebit(mb,95,TRUE);
     printf("SCRITTO\n");
   } /* else esterno che wrappa il connect*/
