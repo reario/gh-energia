@@ -212,9 +212,14 @@ int main()
       set_logname(dat);
 
 #ifdef _DB_
-      if ( insert(ptr,VOLT,AMPERE,PATTIVA,PATTIVA_PT,PATTIVA_POZZO,kWh)<0) {
-	logvalue(LOG_FILE,"Errore di inserimento record nel DB"); 
+      if (VOLT>0 && AMPERE>0) { /* valori non nulli, quindi vado ad inserire nel DB */
+	if ( insert(ptr,VOLT,AMPERE,PATTIVA,PATTIVA_PT,PATTIVA_POZZO,kWh)<0) {
+	  logvalue(LOG_FILE,"Errore di inserimento record nel DB"); 
+	}
+      } else { /* ho letto dei valori nulli di volt e ampere*/
+	logvalue(LOG_FILE,"Letti valori nulli per volt e ampere"); 
       };
+
 #endif
       snprintf(record,(size_t)60,"%s-%s-%s;%s;%3.3f;%3.2f;%3.2f;%3.2f;%3.2f,%3.0f",
 	       dat[GIORNO],dat[MESE],dat[ANNO],dat[ORA],
