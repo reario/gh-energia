@@ -106,7 +106,7 @@ Esempio:
   */
 
 /* name resolution and connection to modbus device */
-  hp=gethostbyname(HOST);
+  hp=gethostbyname("192.168.1.157");
   mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
   /* faccio la connessione */
   if ( (modbus_connect(mb) == -1) ) {
@@ -124,8 +124,13 @@ Esempio:
        On the falling edge it reset %S50. With %S50=0 time is no more updatable  
        Reset of %MW95 is done on PLC so is not necessary to set it to 0 here. This is why here we are only setting %M95 to TRUE. 
     */
-    setsinglebit(mb,95,TRUE);
-    printf("SCRITTO\n");
+
+    if (setsinglebit(mb,95,TRUE)==0) {;
+
+      printf("SCRITTO\n");
+    } else {
+      printf("ERRORE nella scrittura del bit 95 sul PLC. Ora NON aggiornata");
+    }
   } /* else esterno che wrappa il connect*/
   
  modbus_close(mb);
