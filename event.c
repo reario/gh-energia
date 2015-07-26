@@ -383,6 +383,7 @@ int main(void)
     //modbus_set_debug(ctx, TRUE);
 
     mb_mapping = modbus_mapping_new(500,500,500,500);
+
     if (mb_mapping == NULL) {
         fprintf(stderr, "Failed to allocate the mapping: %s\n",
                 modbus_strerror(errno));
