@@ -1,0 +1,29 @@
+# Object files
+*.o
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+\#*\#
+
+# Executables
+*.exe
+*.out
+*.app
+ss
+scatti
+secondi
+value
+operate
+setplctime
+enum
+log/*
+postgres/capacity/*
+#emacs
+*~

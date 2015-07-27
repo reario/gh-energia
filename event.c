@@ -26,7 +26,7 @@
 #include <time.h>
 #include <math.h>
 
-#define NB_CONNECTION    5
+#define NB_CONNECTION    15
 #define WORD 16
 #define DWORD 32
 
