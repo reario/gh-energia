@@ -30,6 +30,7 @@ if command is OFF and Qi>10 then all Qi will be reset
 
 int row,col;
 
+
 int pulsante(modbus_t *m,int bobina) {
   attron(COLOR_PAIR(1));mvprintw(2,col-4,"W");refresh();
   if ( modbus_write_bit(m,bobina,TRUE) != 1 ) {
@@ -49,17 +50,36 @@ int pulsante(modbus_t *m,int bobina) {
   return 0;
 }
 
+int interruttore(modbus_t *m, int bit, uint16_t reg) {
+  /* set il bit iesimo di reg */
+  reg=reg^(1<<bit);
+  
+  attron(COLOR_PAIR(1));mvprintw(2,col-4,"W");refresh();
+  if ( modbus_write_register(m,100,reg) != 1 ) {
+    mvprintw(14,10,"ERRORE DI SCRITTURA:PULSANTE ON");
+    refresh();
+    return -1;
+  }
+  attroff(COLOR_PAIR(1));mvprintw(2,col-4,"W");refresh();
+  return 0;
+}
+
 int main (int argc, char ** argv) {
 
   modbus_t *mb;
+  modbus_t *mb_otb;
   struct hostent *hp;
   int i,ch;
   int cont=1;
 
 
   uint16_t tab_reg[100]; /* vengono allocati 100  spazi anche se se ne utilizzano meno */
+  uint16_t otb_in[10];
+  uint16_t otb_out[10];
+
   int nregs=69; /* 70 registri */
   int addr=7; /* offset */
+
 
   /* 
   DISTRIBUZIONE ORARIA SCATTI AUTOCLAVE E POZZO
@@ -96,10 +116,11 @@ int main (int argc, char ** argv) {
     /* name resolution and connection to modbus device */
     hp=gethostbyname(HOST);
     mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
+    mb_otb = modbus_new_tcp("192.168.1.11",PORT);
 
     attron(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
     /* faccio la connessione */
-    if ( (modbus_connect(mb) == -1) ) {
+    if ( (modbus_connect(mb) == -1) || (modbus_connect(mb_otb) == -1) ) {
       attroff(COLOR_PAIR(1));
       attron(COLOR_PAIR(3));
       mvprintw(0,col-4,"C");
@@ -113,7 +134,11 @@ int main (int argc, char ** argv) {
       
       /* leggo stato degli ingressi e i dati del PM9*/
       /* || (modbus_read_registers(mb, 75, 1, tab_reg+68) < 0) */
-      if ( (modbus_read_registers(mb, addr, nregs, tab_reg) < 0) || (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0)) 
+      if ( (modbus_read_registers(mb, addr, nregs, tab_reg) < 0) || 
+	   (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0) ||
+	   (modbus_read_registers(mb_otb, 0, 3, otb_in) < 0) ||
+	   (modbus_read_registers(mb_otb, 100, 3, otb_out) < 0)
+      ) 
 	{
 	attroff(COLOR_PAIR(1));
 	attron(COLOR_PAIR(3));
@@ -143,7 +168,7 @@ int main (int argc, char ** argv) {
 
 	/******************************************************************************/
 	/* STAMPO I VALORI DI V,A,kW in una nuova finestra*/
-	energia=newwin(5,16,7,25);
+	energia=newwin(5,18,8,25);
 	box(energia,0,0);
 	wrefresh(energia);
 	wattron(energia,A_BOLD);
@@ -153,7 +178,7 @@ int main (int argc, char ** argv) {
 	wattroff(energia,A_BOLD);
 	wrefresh(energia);
 	/******************************************************************************/
-	/* STAMPO LO STATO DEGLI INPUT */
+	/* STAMPO LO STATO DEGLI INPUT DEL PLC*/
 	i=0;
 	while (i<=NUMINPUT-1) {
 	  
@@ -175,12 +200,20 @@ int main (int argc, char ** argv) {
 	  
 	  i++;
 	}
+
+	/* STAMPO LO STATO DEGLI INPUT DEL OTB*/
+
+	
+
+
+
 	/******************************************************************************/
 	/* Scrivo il numero di avvii pozzo e autoclave */
 	mvprintw(0,13,"[%i/%i][%i]",tab_reg[NAU],tab_reg[SHA],tab_reg[SEGA]); /*Secondi Giornalieri Autoclave*/
 	mvprintw(1,13,"[%i/%i][%i]",tab_reg[NPO],tab_reg[SHP],tab_reg[SEGP]); /*Secondi Giornalieri Pozzo*/
-	mvprintw(12,25,"[bar = %1.2f]",(float)tab_reg[70]*0.00244200); /* bar registro 507  del PLC   messo nella posizione 70 del tab_reg */
-	mvprintw(13,25,"[kWh = %4.0f]",(float)kWh);
+	
+	mvprintw(14,25,"[bar = %1.2f]",(float)tab_reg[70]*0.00244200); /* bar registro 507  del PLC   messo nella posizione 70 del tab_reg */
+	mvprintw(15,25,"[kWh = %4.0f]",(float)kWh);
 
 	attron(A_BOLD);
 	/* serratura */ 
@@ -199,8 +232,20 @@ int main (int argc, char ** argv) {
 	mvprintw(6,26,"P-");
 	attroff(A_BOLD);
 	mvprintw(6,28,"parziale cancello");
+	attron(A_BOLD);
 
-
+	/* Fari LED esterni  */
+	mvprintw(7,26,"R-");
+	attroff(A_BOLD);
+	if (otb_in[0] & (1<<FARI_ESTERNI)) {
+	  attron(COLOR_PAIR(0));
+	  mvprintw(7,28,"fari esterni");
+	  attroff(COLOR_PAIR(0));
+	} else {
+	  attron(COLOR_PAIR(1));
+	  mvprintw(7,28,"fari esterni");
+	  attroff(COLOR_PAIR(1));
+	}
 	refresh();
 	ch=getch();
 	switch (ch) {
@@ -226,7 +271,7 @@ int main (int argc, char ** argv) {
 	  break;
 	case 'h':
 	  if ( pulsante(mb,LUCI_ANDRONE_SCALE)!=0) {
-	    cont=0;}
+	    cont=0; }
 	  break;
 	case 'i':
 	  if ( pulsante(mb,LUCI_STUDIO_SOTTO)!=0) {
@@ -234,23 +279,23 @@ int main (int argc, char ** argv) {
 	  break;
 	case 'm':
 	  if ( pulsante(mb,LUCI_CANTINETTA) !=0) {
-	    cont=0;
-	  }
+	    cont=0;  }
 	  break;
 	case 'o':
 	  if ( pulsante(mb,SERRATURA_PORTONE) !=0) {
-	    cont=0;
-	  }
+	    cont=0;  }
 	  break;
 	case 'n':
 	  if ( pulsante(mb,APERTURA_TOTALE) !=0) {
-	    cont=0;
-	  }
+	    cont=0;  }
 	  break;
 	case 'p':
 	  if ( pulsante(mb,APERTURA_PARZIALE) !=0) {
-	    cont=0;
-	  }
+	    cont=0;  }
+	  break;
+	case 'r':
+	  if ( interruttore(mb_otb,FARI_ESTERNI,otb_out[0]) !=0) {
+	    cont=0;  }
 	  break;
      	case 'q':
 	  cont=0;
@@ -265,6 +310,9 @@ int main (int argc, char ** argv) {
 
     modbus_close(mb);
     modbus_free(mb);
+
+    modbus_close(mb_otb);
+    modbus_free(mb_otb);
 
     refresh();
     delwin(energia);

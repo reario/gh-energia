@@ -30,9 +30,24 @@
 #define WORD 16
 #define DWORD 32
 
+/*
+PLC
+ */
 #define I0_16 65 /* word che contiene lo stato degli input 0-16*/
 #define I16_32 66 /* word che contiene lo stato degli input 16-32 */
 #define Q0_32 67 /* word che contiene lo stato degli output 0-32*/
+
+/*
+OTB
+ */
+#define OTBDIN 74  /* word che contiene lo stato degli input 0-7 dell'OTB*/
+#define OTBAIN1 75 /* word che contiene lo stato dell'input analogico 1 dell'OTB (BAR AUTOCLAVE) */
+#define OTBAIN2 76 /* word che contiene lo stato dell'input analogico 3 dell'OTB (BAR POZZO) */
+#define OTBDOUT 77 /* word che contiene lo stato degli output 0-7 dell'OTB */
+#define OTBAOUT1 78 /* word che contiene lo stato dell'output analogico 1 dell'OTB */
+#define OTBAOUT2 79 /* word che contiene lo stato dell'output analogico 2 dell'OTB */
+
+
 
 #define CONN "hostaddr=192.168.1.103 user=reario dbname=reario_db"; // <-- DB postgres
 
@@ -62,10 +77,14 @@ char *inputs_names[]={
   "LUCI_CANTINETTA"
 };
 
-/* definizione di variabili per calcolo statistico della tensione */
+
+
+
+
 
 
 #ifdef CUMULATIVE
+/* definizione di variabili per calcolo statistico della tensione */
 unsigned long long VN; /* numero dei campioni rilevati, da inizializzare con il valore presente nel DB tabella Vstat*/
 float sumVxi; /* somma dei campioni, da inizializzare con il valore presente nl DB tabella Vstat*/
 float sumVxi2; /* somma del quadrato dei campioni, da inizializzare con il valore presente nl DB tabella Vstat*/
@@ -495,7 +514,8 @@ int main(void)
 
 		      for (x=0;x < DWORD; x++) {
 			if (diff & (1<<x)) { /* ho trovato 1 nella posizione x-esima di diff*/
-			  /*vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
+			  /*
+			    vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
 			    diff contiene 1 se lo stato del bit e' cambiato. Che transizione è avvenuta? da on a off o da off a on?
 			    se il bit x-esimo di *in* (vettore attuale degli ingressi) è 1 allora c'è stata la transizione da off a on.
 			    se il bi x-esimo è di *in* è 0 allora c'è stata la transizione da on a off 
@@ -518,7 +538,9 @@ int main(void)
 		      72,73 - PL e PH potenza  (reg 29 e 30 del plc)
 		     */
 		    
-		    
+		    /*
+		     per adesso non vengono usate
+		     */
 		    V=(float)((mb_mapping->tab_registers[70]<<16)+mb_mapping->tab_registers[71])/1000;
 		    I=(float)((mb_mapping->tab_registers[68]<<16)+mb_mapping->tab_registers[69])/1000;
 		    P=(float)((mb_mapping->tab_registers[72]<<16)+mb_mapping->tab_registers[73])/100;
