@@ -212,8 +212,8 @@ int main (int argc, char ** argv) {
 	mvprintw(0,13,"[%i/%i][%i]",tab_reg[NAU],tab_reg[SHA],tab_reg[SEGA]); /*Secondi Giornalieri Autoclave*/
 	mvprintw(1,13,"[%i/%i][%i]",tab_reg[NPO],tab_reg[SHP],tab_reg[SEGP]); /*Secondi Giornalieri Pozzo*/
 	
-	mvprintw(14,25,"[bar = %1.2f]",(float)tab_reg[70]*0.00244200); /* bar registro 507  del PLC   messo nella posizione 70 del tab_reg */
-	mvprintw(15,25,"[kWh = %4.0f]",(float)kWh);
+	mvprintw(13,25,"[bar = %1.2f]",(float)tab_reg[70]*0.00244200); /* bar registro 507  del PLC   messo nella posizione 70 del tab_reg */
+	mvprintw(14,25,"[kWh = %4.0f]",(float)kWh);
 
 	attron(A_BOLD);
 	/* serratura */ 
@@ -237,7 +237,7 @@ int main (int argc, char ** argv) {
 	/* Fari LED esterni  */
 	mvprintw(7,26,"R-");
 	attroff(A_BOLD);
-	if (otb_in[0] & (1<<FARI_ESTERNI)) {
+	if (otb_in[0] & (1<<FARI_ESTERNI_IN)) {
 	  attron(COLOR_PAIR(0));
 	  mvprintw(7,28,"fari esterni");
 	  attroff(COLOR_PAIR(0));

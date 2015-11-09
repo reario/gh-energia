@@ -147,6 +147,7 @@ struct item input[]={ {' ', "Autoclave"},
 #define APERTURA_PARZIALE 96 /* %M96 */
 #define APERTURA_TOTALE 97 /* %M97 */
 #define FARI_ESTERNI 0 /* 0-esimo bit dell'uscita dell'OTB Q0*/
+#define FARI_ESTERNI_IN 11 /* 11-esimo bit dell'ingresso dell'OTB IN11*/
 /* Cicalini */
 #define CICALINO_AUTOCLAVE 60 /* %M60 */
 #define CICALINO_POMPA_POZZO 61 /* %M61 */
