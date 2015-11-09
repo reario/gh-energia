@@ -47,8 +47,6 @@ OTB
 #define OTBAOUT1 78 /* word che contiene lo stato dell'output analogico 1 dell'OTB */
 #define OTBAOUT2 79 /* word che contiene lo stato dell'output analogico 2 dell'OTB */
 
-
-
 #define CONN "hostaddr=192.168.1.103 user=reario dbname=reario_db"; // <-- DB postgres
 
 modbus_t *ctx = NULL;
@@ -74,14 +72,11 @@ char *inputs_names[]={
   "LUCI_STUDIO_SOTTO",
   "LUCI_ANDRONE_SCALE",
   "GENERALE_AUTOCLAVE",
-  "LUCI_CANTINETTA"
+  "LUCI_CANTINETTA",
+  "TOTALE_CANCELLO",
+  "PARZIALE_CANCELLO",
+  "FARI ESTERNI"
 };
-
-
-
-
-
-
 
 #ifdef CUMULATIVE
 /* definizione di variabili per calcolo statistico della tensione */
@@ -103,7 +98,6 @@ int updateVstat(unsigned long long N,float sumxi,float sumxi2) {
   sprintf(query,"UPDATE Vstat SET vn=%llu,sumVxi=%f,sumVxi2=%f",N,sumxi,sumxi2);
   
 #ifdef DOINSERT3
-  
   if (PQstatus(conn) != CONNECTION_OK) 
     {
       sprintf(errormsg,"%s\n", PQerrorMessage(conn));
@@ -211,11 +205,8 @@ int inittable() {
 
 
 int insert3 (char *input, int stato, int pos) {
-
   /*stato: 0=OFF, 1=ON*/
-  
   time_t timer;
-
   char datestring[11];
   char timestring[9];
   char query[512]; 
@@ -233,9 +224,10 @@ int insert3 (char *input, int stato, int pos) {
   strftime(timestring, sizeof(timestring),"%H:%M:%S",localtime(&timer));
   
   if (stato==0) {/*ON*/
-    /* mettere come chiave la concatenazione di data|orastart|input ? */
-    eventkeys[pos]=time(NULL)+pos; /* metto +pos perchè se l'aggiornamento avviene su due bit all'interno dello stesso sec. la chiave sarebbela stessa per entrambi i bit in quanto il timestamp è in secondi*/
-
+    /* mettere come chiave la concatenazione di data|orastart|input ? */    
+    /* metto +pos perchè se l'aggiornamento avviene su due bit all'interno dello stesso secondo,
+       la chiave sarebbela stessa per entrambi i bit in quanto il timestamp è in secondi*/
+    eventkeys[pos]=time(NULL)+pos; 
     sprintf(query,"INSERT INTO events (data,input,orastart,orastop,ts) values ('%s','%s','%s',NULL,'%lld');",datestring,input,timestring,eventkeys[pos]);   
   } else {/*OFF*/
     sprintf(query,"UPDATE events set orastop='%s' WHERE ts='%lld'",timestring,eventkeys[pos]);
@@ -386,7 +378,7 @@ int main(void)
     uint32_t in,inprev,diff;  /* tutti gli input dentro una DWORD (32 bit) */
     float V,I,P,Vpre,Ipre,Ppre; /* Volt Ampere e Watt */
 
-
+    unint16_t otb_din; /* ingressi digitali dell'OTB */
 
 
 #ifdef CUMULATIVE
@@ -498,10 +490,15 @@ int main(void)
 		  case 0x10:
 		  case 0x06: {/* il PLC sta chiedendo di scrivere N registri  */
 
-		    /*-------------------I/O--------------------------------------*/		  
-		    in1=mb_mapping->tab_registers[I0_16];
-		    in2=mb_mapping->tab_registers[I16_32];
-		    
+		    /*------------------- PLC IN--------------------------------------*/		  
+		    in1=mb_mapping->tab_registers[I0_16]; /* 65 */
+		    in2=mb_mapping->tab_registers[I16_32]; /* 66 */
+
+		    /*------------------- OTB DIGITAL IN--------------------------------------*/
+		   
+
+
+
 		    in1=reverseBits16(in1);
 		    in2=reverseBits16(in2);
 		    
