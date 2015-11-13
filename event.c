@@ -628,7 +628,7 @@ int main(void)
 		    diff= inlong^inprev; /* xor: ogni 1 in diff significa che l'input è cambiato */
 
 		    if (diff) {		    
-		      for (x=0;x < 64; x++) {
+		      for (x=0;x < QWORD; x++) {
 			if (diff & ((uint64_t)1<<x)) { /* ho trovato 1 nella posizione x-esima di diff*/
 			  /*
 			    Vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
