@@ -56,7 +56,7 @@ int interruttore(modbus_t *m, int bit, uint16_t reg) {
   
   attron(COLOR_PAIR(1));mvprintw(2,col-4,"W");refresh();
   if ( modbus_write_register(m,100,reg) != 1 ) {
-    mvprintw(14,10,"ERRORE DI SCRITTURA:PULSANTE ON");
+    mvprintw(14,10,"ERRORE DI SCRITTURA:INTERRUTTORE ON");
     refresh();
     return -1;
   }
@@ -238,13 +238,13 @@ int main (int argc, char ** argv) {
 	mvprintw(7,26,"R-");
 	attroff(A_BOLD);
 	if (otb_in[0] & (1<<FARI_ESTERNI_IN)) {
-	  attron(COLOR_PAIR(0));
-	  mvprintw(7,28,"fari esterni");
-	  attroff(COLOR_PAIR(0));
-	} else {
 	  attron(COLOR_PAIR(1));
 	  mvprintw(7,28,"fari esterni");
 	  attroff(COLOR_PAIR(1));
+	} else {
+	  attron(COLOR_PAIR(0));
+	  mvprintw(7,28,"fari esterni");
+	  attroff(COLOR_PAIR(0));
 	}
 	refresh();
 	ch=getch();

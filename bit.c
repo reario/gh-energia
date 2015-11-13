@@ -86,4 +86,5 @@ void printbitssimple(uint16_t n) {
       printw("0");
     i >>= 1;
   }
+  printf("\n");
 }

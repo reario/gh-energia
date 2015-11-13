@@ -34,7 +34,7 @@ ss: pgdb.o ss.o
 #	$(CC) -Wall -I${INCDIR}/modbus -I${DBINCDIR} -L${LIBDIR} -L${DBLIBDIR} -lmodbus -lncurses -lmysqlclient $^ -o $@
 
 event: event.o
-	$(CC) -Wall -L${LIBDIR} -lmodbus -lpq $^ -o $@
+	$(CC) -Wall -L${LIBDIR} -lmodbus -lpq -lm $^ -o $@
 
 enum: enum.o
 	$(CC) -g -Wall -L${LIBDIR} -lgsl -lgslcblas -lm $^ -o $@

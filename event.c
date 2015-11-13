@@ -29,6 +29,7 @@
 #define NB_CONNECTION    15
 #define WORD 16
 #define DWORD 32
+#define QWORD 64
 
 /*
 PLC
@@ -56,27 +57,155 @@ modbus_mapping_t *mb_mapping;
 unsigned long long eventkeys[DWORD];
 
 char *inputs_names[]={
-  "AUTOCLAVE",
-  "POMPA_SOMMERSA",
-  "RIEMPIMENTO",
-  "LUCI_ESTERNE_SOTTO",
-  "CENTR_R8",
-  "LUCI_GARAGE_DA_4",
-  "LUCI_GARAGE_DA_2",
-  "LUCI_TAVERNA_1_di_2",
-  "LUCI_TAVERNA_2_di_2",
-  "INTERNET",
-  "C9912",
-  "LUCI_CUN_LUN",
-  "LUCI_CUN_COR",
-  "LUCI_STUDIO_SOTTO",
-  "LUCI_ANDRONE_SCALE",
-  "GENERALE_AUTOCLAVE",
-  "LUCI_CANTINETTA",
-  "TOTALE_CANCELLO",
-  "PARZIALE_CANCELLO",
-  "FARI ESTERNI"
+ 
+  "AUTOCLAVE", // 0
+  "POMPA_SOMMERSA", // 1
+  "RIEMPIMENTO", // 2
+  "LUCI_ESTERNE_SOTTO", // 3
+  "CENTR_R8", // 4
+  "LUCI_GARAGE_DA_4", // 5
+  "LUCI_GARAGE_DA_2", // 6
+  "LUCI_TAVERNA_1_di_2", // 7
+  "LUCI_TAVERNA_2_di_2", // 8
+  "INTERNET",            // 9
+  "C9912",              // 10
+  "LUCI_CUN_LUN",       // 11
+  "LUCI_CUN_COR",       // 12
+  "LUCI_STUDIO_SOTTO",  // 13
+  "LUCI_ANDRONE_SCALE", // 14
+  "GENERALE_AUTOCLAVE", // 15
+  "LUCI_CANTINETTA",    // 16 
+  "PLC_INPUT_17", // 17
+  "PLC_INPUT_18", // 18
+  "PLC_INPUT_19", // 19
+  "PLC_INPUT_20", // 20
+  "PLC_INPUT_21", // 21
+  "PLC_INPUT_22", // 22
+  "PLC_TM2_INPUT_0",  // 23
+  "PLC_TM2_INPUT_1",  // 24
+  "PLC_TM2_INPUT_2",  // 25
+  "PLC_TM2_INPUT_3",  // 26
+  "PLC_TM2_INPUT_4",  // 27
+  "PLC_TM2_INPUT_5",  // 28
+  "PLC_TM2_INPUT_6",  // 29
+  "PLC_TM2_INPUT_7",  // 30
+  "PLC_TM2_INPUT_8",  // 31
+  "PLC_TM2_INPUT_9",  // 32
+  "PLC_TM2_INPUT_10", // 33
+  "PLC_TM2_INPUT_11", // 34
+  "PLC_TM2_INPUT_12", // 35
+  "PLC_TM2_INPUT_13", // 36
+  "PLC_TM2_INPUT_14", // 37
+  "PLC_TM2_INPUT_15", // 38
+  "OTB_DIN_0", // 39
+  "OTB_DIN_1", // 40
+  "OTB_DIN_2", // 41
+  "OTB_DIN_3", // 42
+  "OTB_DIN_4", // 43
+  "OTB_DIN_5", // 44
+  "OTB_DIN_6", // 45
+  "OTB_DIN_7", // 46
+  "OTB_DIN_8", // 47
+  "OTB_DIN_9", // 48
+  "OTB_DIN_10",// 49
+  "FARI_ESTERNI",// 50  (OTB)
+  "IN_51",  // 51
+  "IN_52",  // 52
+  "IN_53",  // 53
+  "IN_54",  // 54
+  "IN_55",  // 55
+  "IN_56",  // 56
+  "IN_57",  // 57
+  "IN_58",  // 58
+  "IN_59",  // 59
+  "IN_60",  // 60
+  "IN_61",  // 61
+  "IN_62",  // 62
+  "IN_63"   // 63
+
 };
+
+uint64_t place (uint64_t dest, uint16_t source, uint16_t pos) {
+
+  uint64_t temp=0;
+
+  temp=temp|source;
+  temp=temp<<pos;
+  dest=dest|temp;
+  return dest;
+
+}
+
+
+void printbitssimple64(uint64_t n) {
+  /*dato l'intero n stampa la rappresentazione binaria*/
+  uint64_t i;
+  int j;
+  i = (uint64_t)1<<(sizeof(n) * 8 - 1); /* 2^n */
+  for (j=63;j>=0;j--) {   
+    printf(" %2i",j);
+  }
+  printf("\n");  
+
+  while (i > 0) {
+    if (n & i)
+      printf(" %2i",1);
+    else
+      printf(" %2i",0);
+    i >>= 1;
+  }
+  printf("\n");
+}
+
+
+void printbitssimple32(uint32_t n) {
+  /*dato l'intero n stampa la rappresentazione binaria*/
+  uint32_t i;
+  int j;
+  i = (uint32_t)1<<(sizeof(n) * 8 - 1); /* 2^n */
+  for (j=31;j>=0;j--) {   
+    printf(" %2i",j);
+  }
+  printf("\n");  
+
+  while (i > 0) {
+    if (n & i)
+      printf("1");
+    else
+      printf("0");
+    i >>= 1;
+  }
+  printf("\n");
+}
+
+void printbitssimple16(uint16_t n) {
+  /*dato l'intero n stampa la rappresentazione binaria*/
+  uint16_t i;
+  int j;
+  i = (uint16_t)1<<(sizeof(n) * 8 - 1); /* 2^n */
+
+  for (j=15;j>=0;j--) {   
+    printf(" %2i",j);
+  }
+  printf("\n");  
+  while (i > 0) {
+    if (n & i)
+      printf("1");
+    else
+      printf("0");
+    i >>= 1;
+  }
+  printf("\n");
+}
+
+
+uint16_t read_single_state(uint16_t reg, uint16_t q) {
+  /*legge q-esomo bit di reg*/
+  uint16_t i;
+  i=(1<<q); /* 2^q */
+  if (reg & i) {return 1;} else {return 0;};
+}
+
 
 #ifdef CUMULATIVE
 /* definizione di variabili per calcolo statistico della tensione */
@@ -203,7 +332,9 @@ int inittable() {
     return(0);
 }
 
-
+/*
+-------------------  INSERT3 -----------------------
+*/
 int insert3 (char *input, int stato, int pos) {
   /*stato: 0=OFF, 1=ON*/
   time_t timer;
@@ -369,26 +500,24 @@ int main(void)
     /* Maximum file descriptor number */
     int fdmax;
 
-
-    uint8_t *prev_status_bit;
-    uint16_t *prev_status_reg;
-
     uint16_t in1; /*prima parte dei 16 input, quelli da 0 a 15 : registro 65 sul plc master*/
     uint16_t in2; /*prima parte dei 16 input, quelli da 16 a 23 : registro 66 sul plc master*/
-    uint32_t in,inprev,diff;  /* tutti gli input dentro una DWORD (32 bit) */
-    float V,I,P,Vpre,Ipre,Ppre; /* Volt Ampere e Watt */
+    uint16_t in3; /*8 ingressi digitali sul modulo di espansione del PLC*/
 
-    unint16_t otb_din; /* ingressi digitali dell'OTB */
+    uint64_t inprev=0,diff=0;  /* tutti gli input dentro una (64 bit) */
+    uint64_t inlong=0;
+    uint16_t otb_din; /* ingressi digitali dell'OTB */
 
 
 #ifdef CUMULATIVE
+    float V,I,P,Vpre,Ipre,Ppre; /* Volt Ampere e Watt */
     float Vsigma; /* scarto quadratico medio della tensione */
-#endif
+
     inprev=0;
     Vpre=0;
     Ipre=0;
     Ppre=0;
-
+#endif
 
     ctx = modbus_new_tcp("NULL",502);
     //modbus_set_debug(ctx, TRUE);
@@ -414,14 +543,6 @@ int main(void)
     /* Keep track of the max file descriptor */
     fdmax = server_socket;
 
-    /* metto a zero gli array degli stati */
-    prev_status_bit = (uint8_t *) malloc(WORD*sizeof(uint8_t));
-    memset(prev_status_bit, 0, WORD*sizeof(uint8_t));
-
-    prev_status_reg = (uint16_t *) malloc(DWORD*sizeof(uint16_t));
-    memset(prev_status_reg, 0, DWORD*sizeof(uint16_t));
-
-
     if (inittable()!=0) {
       printf("init table failed\n");
       exit(-1);
@@ -437,8 +558,7 @@ int main(void)
       
       /* Run through the existing connections looking for data to be
        * read */
-      for (master_socket = 0; master_socket <= fdmax; master_socket++) {
-	
+      for (master_socket = 0; master_socket <= fdmax; master_socket++) {	
 	if (!FD_ISSET(master_socket, &rdset)) {
 	  continue;
 	}
@@ -478,10 +598,11 @@ int main(void)
 		  modbus_reply(ctx, query, rc, mb_mapping);		    
 		  /***********************************************************************************/
 		  /* a questo punto il PLC ha scritto tutti i registri: 65 66 67 (I/O), 68,69 (I) 70,71 (V) 72,73 (P) */  
-		  int x,offset = modbus_get_header_length(ctx);
+		  int offset = modbus_get_header_length(ctx);
+		  uint16_t x=0;
 		  /***** Estraggo il codice richiesta *****/
 		  uint16_t address = (query[offset + 1]<< 8) + query[offset + 2];		  
-
+		  
 		  switch (query[offset]) {
 		  case 0x05: {/* il PLC sta chiedendo di scrivere BITS */		      
 		    printf("Coil Registro %d-->%s [0x%02X]\n",address,(mb_mapping->tab_bits[address])?"ON":"OFF",query[offset]);     
@@ -493,37 +614,37 @@ int main(void)
 		    /*------------------- PLC IN--------------------------------------*/		  
 		    in1=mb_mapping->tab_registers[I0_16]; /* 65 */
 		    in2=mb_mapping->tab_registers[I16_32]; /* 66 */
-
+		    in3=mb_mapping->tab_registers[80]; /* Ingressi Modulo esterno del PLC TM2... (80) */
+		    
 		    /*------------------- OTB DIGITAL IN--------------------------------------*/
-		   
+		    otb_din=mb_mapping->tab_registers[OTBDIN];
 
+		    inlong=0;		    
+		    inlong=place(inlong,in1,0);      // 0-15
+		    inlong=place(inlong,in2,16);     // 16-22
+		    inlong=place(inlong,in3,23);     // 23-38
+		    inlong=place(inlong,otb_din,39); // 39-50
 
+		    diff= inlong^inprev; /* xor: ogni 1 in diff significa che l'input è cambiato */
 
-		    in1=reverseBits16(in1);
-		    in2=reverseBits16(in2);
-		    
-		    in=(in1<<16)+in2;
-		    in=reverseBits32(in);
-		    
-		    diff= in^inprev; /* xor: ogni 1 in diff significa che l'input è cambiato */
-		    
 		    if (diff) {		    
-
-		      for (x=0;x < DWORD; x++) {
-			if (diff & (1<<x)) { /* ho trovato 1 nella posizione x-esima di diff*/
+		      for (x=0;x < 64; x++) {
+			if (diff & ((uint64_t)1<<x)) { /* ho trovato 1 nella posizione x-esima di diff*/
 			  /*
-			    vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
-			    diff contiene 1 se lo stato del bit e' cambiato. Che transizione è avvenuta? da on a off o da off a on?
+			    Vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
+			    diff contiene 1 se lo stato del bit e' cambiato.
+			    Che transizione è avvenuta? da on a off o da off a on?
 			    se il bit x-esimo di *in* (vettore attuale degli ingressi) è 1 allora c'è stata la transizione da off a on.
 			    se il bi x-esimo è di *in* è 0 allora c'è stata la transizione da on a off 
 			  */
-			  if (insert3(inputs_names[x],(inprev & (1<<x)),x)==1) {
+			  printf("%s %i %s \n",inputs_names[x],x, (inprev & ((uint64_t)1<<x))==0 ? "ON" : "OFF");
+			  if (insert3(inputs_names[x],(inprev & ((uint64_t)1<<x)),x)==1) {
 			    printf("db error\n");
 			  }
 			  // printf("%s\t%s\n",inputs_names[x],(inprev & (1<<x))?"OFF":"ON");			  
 			}
 		      }
-		      inprev=in;
+		      inprev=inlong;		      
 		    } /* if (diff) */
 
 		    /*-----------------------------------------------------------*/
@@ -534,7 +655,8 @@ int main(void)
 		      70,71 - VL e VH tensione (reg 21 e 22 del plc)
 		      72,73 - PL e PH potenza  (reg 29 e 30 del plc)
 		     */
-		    
+
+#ifdef CUMULATIVE		     			    
 		    /*
 		     per adesso non vengono usate
 		     */
@@ -542,14 +664,15 @@ int main(void)
 		    I=(float)((mb_mapping->tab_registers[68]<<16)+mb_mapping->tab_registers[69])/1000;
 		    P=(float)((mb_mapping->tab_registers[72]<<16)+mb_mapping->tab_registers[73])/100;
 		    		    
-		     	
+
+
 			if (Vpre != V) {
-#ifdef CUMULATIVE
+
 			  VN=VN+1;
 			  sumVxi=sumVxi+V;
 			  sumVxi2=sumVxi2+V*V; //pow(V,2);
 			  updateVstat(VN,sumVxi,sumVxi2);
-#endif
+
 			  printf("-- V = %3.3f\n-- A = %3.3f\n-- P = %3.3f\n\n",V,I,P*1000);
 			}
 		     
@@ -557,7 +680,7 @@ int main(void)
 		    Vpre=V;
 		    Ipre=I;
 		    Ppre=P; /*li salvo per il prossimo ciclo*/		    
-		    
+#endif		    
 		  } /* case 0x06 */
 		    break;
 		  } /* switch */
@@ -567,7 +690,7 @@ int main(void)
 	  		  
 		  
                 } else if (rc == -1) {
-		  /* This example server in ended on connection closing or
+		  /*server is ended on connection closing or
 		   * any errors. */
 		  //		   printf("Connection closed on socket %d\n", master_socket);
 		  close(master_socket);
