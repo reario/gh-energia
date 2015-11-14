@@ -54,7 +54,7 @@ modbus_t *ctx = NULL;
 int server_socket = -1;
 modbus_mapping_t *mb_mapping;
 
-unsigned long long eventkeys[DWORD];
+unsigned long long eventkeys[QWORD];
 
 char *inputs_names[]={
  
@@ -335,7 +335,7 @@ int inittable() {
 /*
 -------------------  INSERT3 -----------------------
 */
-int insert3 (char *input, int stato, int pos) {
+int insert3 (char *input, uint64_t stato, uint16_t pos) {
   /*stato: 0=OFF, 1=ON*/
   time_t timer;
   char datestring[11];
@@ -361,6 +361,7 @@ int insert3 (char *input, int stato, int pos) {
     eventkeys[pos]=time(NULL)+pos; 
     sprintf(query,"INSERT INTO events (data,input,orastart,orastop,ts) values ('%s','%s','%s',NULL,'%lld');",datestring,input,timestring,eventkeys[pos]);   
   } else {/*OFF*/
+    printf("POS=%d - eventkeys[%d]=%lld\n",pos,pos,eventkeys[pos]);
     sprintf(query,"UPDATE events set orastop='%s' WHERE ts='%lld'",timestring,eventkeys[pos]);
   }
 
@@ -637,8 +638,8 @@ int main(void)
 			    se il bit x-esimo di *in* (vettore attuale degli ingressi) è 1 allora c'è stata la transizione da off a on.
 			    se il bi x-esimo è di *in* è 0 allora c'è stata la transizione da on a off 
 			  */
-			  printf("%s %i %s \n",inputs_names[x],x, (inprev & ((uint64_t)1<<x))==0 ? "ON" : "OFF");
-			  if (insert3(inputs_names[x],(inprev & ((uint64_t)1<<x)),x)==1) {
+			  printf("%s %i [%lld] %s \n",inputs_names[x],x, (inprev & ((uint64_t)1<<x)),(inprev & ((uint64_t)1<<x))==0 ? "ON" : "OFF");
+			  if (insert3(inputs_names[x],(inprev & ((uint64_t)1<<x)),x) == 1) {
 			    printf("db error\n");
 			  }
 			  // printf("%s\t%s\n",inputs_names[x],(inprev & (1<<x))?"OFF":"ON");			  
