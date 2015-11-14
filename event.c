@@ -599,7 +599,7 @@ int main(void)
 	  if (rc > 0) {
 		  modbus_reply(ctx, query, rc, mb_mapping);		    
 		  /***********************************************************************************/
-		  /* a questo punto il PLC ha scritto tutti i registri: 65 66 67 (I/O), 68,69 (I) 70,71 (V) 72,73 (P) */  
+		  /* a questo punto il PLC ha scritto tutti i registri: 65 66 67 (I/O), 68,69 (I) 70,71 (V) 72,73 (P) .......... */
 		  int offset = modbus_get_header_length(ctx);
 		  uint16_t x=0;
 		  /***** Estraggo il codice richiesta *****/
@@ -636,8 +636,8 @@ int main(void)
 			    Vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
 			    diff contiene 1 se lo stato del bit e' cambiato.
 			    Che transizione è avvenuta? da on a off o da off a on?
-			    se il bit x-esimo di *in* (vettore attuale degli ingressi) è 1 allora c'è stata la transizione da off a on.
-			    se il bi x-esimo è di *in* è 0 allora c'è stata la transizione da on a off 
+			    se il bit x-esimo di *inlong* (vettore attuale degli ingressi) è 1 allora c'è stata la transizione da off a on.
+			    se il bi x-esimo è di *inlong* è 0 allora c'è stata la transizione da on a off
 			  */
 			  printf("%s %i [%lld] %s \n",inputs_names[x],x, (inprev & ((uint64_t)1<<x)),(inprev & ((uint64_t)1<<x))==0 ? "ON" : "OFF");
 			  if (insert3(inputs_names[x],(inprev & ((uint64_t)1<<x)),x) == 1) {
