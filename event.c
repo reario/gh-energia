@@ -54,6 +54,7 @@ modbus_t *ctx = NULL;
 int server_socket = -1;
 modbus_mapping_t *mb_mapping;
 
+/* per ognuno degli eventi viene memorizzato il codice (massimo QWORD eventi, cioè 64). Ogni codice è un timestamp */
 unsigned long long eventkeys[QWORD];
 
 char *inputs_names[]={
