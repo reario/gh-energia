@@ -31,7 +31,7 @@ That will toggle bit x.
 Checking a bit
 --------------
 To check a bit, AND it with the bit you want to check:
-bit = number & (1 << x);ì
+bit = number & (1 << x);
 That will put the value of bit x into the variable bit
 
 */

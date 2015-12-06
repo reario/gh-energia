@@ -102,13 +102,13 @@ struct item input[]={ {' ', "Autoclave"},
 		      {' ', "Pompa po."},
 		      {' ', "Riempimento serbatoio"},
 		      {'C', "Luci esterne"},
-		      {'*', "Centr. R8"},
+		      {' ', "Centr. R8"},
 		      {'G', "Luce garage da 4"},
 		      {'G', "Luce garage da 2"},
 		      {'F', "Luce taverna 1"},
 		      {'F', "Luce taverna 2"},
 		      {' ', "INTERNET"},
-		      {'*', "9912"},
+		      {' ', "9912"},
 		      {'D', "Luce cunicolo lungo"},		      
 		      {'E', "Luce cunicolo corto"},
 		      {'I', "Luce studio sotto"},
@@ -146,8 +146,10 @@ struct item input[]={ {' ', "Autoclave"},
 #define SERRATURA_PORTONE 12 /* %M12 */
 #define APERTURA_PARZIALE 96 /* %M96 */
 #define APERTURA_TOTALE 97 /* %M97 */
-#define FARI_ESTERNI 0 /* 0-esimo bit dell'uscita dell'OTB Q0*/
-#define FARI_ESTERNI_IN 11 /* 11-esimo bit dell'ingresso dell'OTB IN11*/
+#define FARI_ESTERNI_SOPRA 0 /* 0-esimo bit dell'uscita dell'OTB Q0*/
+#define FARI_ESTERNI_SOTTO 1 /* 1-esimo bit dell'uscita dell'OTB Q0*/
+#define FARI_ESTERNI_IN_SOPRA 11 /* 11-esimo bit dell'ingresso dell'OTB IN11*/
+#define FARI_ESTERNI_IN_SOTTO 10 /* 10-esimo bit dell'ingresso dell'OTB IN11*/
 /* Cicalini */
 #define CICALINO_AUTOCLAVE 60 /* %M60 */
 #define CICALINO_POMPA_POZZO 61 /* %M61 */

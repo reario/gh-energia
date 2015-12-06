@@ -19,6 +19,7 @@
 event
 ss
 scatti
+event
 secondi
 value
 operate
@@ -26,5 +27,6 @@ setplctime
 enum
 log/*
 postgres/capacity/*
+libmodbus/*
 #emacs
 *~

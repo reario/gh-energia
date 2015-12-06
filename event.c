@@ -57,8 +57,7 @@ modbus_mapping_t *mb_mapping;
 /* per ognuno degli eventi viene memorizzato il codice (massimo QWORD eventi, cioè 64). Ogni codice è un timestamp */
 unsigned long long eventkeys[QWORD];
 
-char *inputs_names[]={
- 
+char *inputs_names[]={ 
   "AUTOCLAVE", // 0
   "POMPA_SOMMERSA", // 1
   "RIEMPIMENTO", // 2
@@ -108,7 +107,7 @@ char *inputs_names[]={
   "OTB_DIN_7", // 46
   "OTB_DIN_8", // 47
   "OTB_DIN_9", // 48
-  "OTB_DIN_10",// 49
+  "FARI_ESTERNI_SOTTO",// 49 (OTB)
   "FARI_ESTERNI",// 50  (OTB)
   "IN_51",  // 51
   "IN_52",  // 52
@@ -128,6 +127,8 @@ char *inputs_names[]={
 
 uint64_t place (uint64_t dest, uint16_t source, uint16_t pos) {
 
+  /* places the string of bit represented by source in position pos (starting from left) into dest */
+ 
   uint64_t temp=0;
 
   temp=temp|source;
@@ -618,10 +619,10 @@ int main(void)
 		    in2=mb_mapping->tab_registers[I16_32]; /* 66 */
 		    in3=mb_mapping->tab_registers[80]; /* Ingressi Modulo esterno del PLC TM2... (80) */
 		    
-		    /*------------------- OTB DIGITAL IN--------------------------------------*/
+		    /*------------------- OTB DIGITAL IN------------------------------*/
 		    otb_din=mb_mapping->tab_registers[OTBDIN];
+		    inlong=0;
 
-		    inlong=0;		    
 		    inlong=place(inlong,in1,0);      // 0-15
 		    inlong=place(inlong,in2,16);     // 16-22
 		    inlong=place(inlong,in3,23);     // 23-38

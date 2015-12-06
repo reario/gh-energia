@@ -168,7 +168,7 @@ int main (int argc, char ** argv) {
 
 	/******************************************************************************/
 	/* STAMPO I VALORI DI V,A,kW in una nuova finestra*/
-	energia=newwin(5,18,8,25);
+	energia=newwin(6,19,9,26);
 	box(energia,0,0);
 	wrefresh(energia);
 	wattron(energia,A_BOLD);
@@ -183,7 +183,7 @@ int main (int argc, char ** argv) {
 	while (i<=NUMINPUT-1) {
 	  
 	    /* stampo i tag per le voci dei menu*/
-	    if ( (input[i].tag != ' ') && (input[i].tag != '*') ) { /* stampo in bold i tag del menu */
+	    if ( (input[i].tag != ' ') && (input[i].tag != ' ') ) { /* stampo in bold i tag del menu */
 	      attron(A_BOLD);
 	      mvprintw( 0+((i<=12)?i:i-13),0+( (i<=12)?1:26),"%c-",input[i].tag);
 	      attroff(A_BOLD);
@@ -212,8 +212,8 @@ int main (int argc, char ** argv) {
 	mvprintw(0,13,"[%i/%i][%i]",tab_reg[NAU],tab_reg[SHA],tab_reg[SEGA]); /*Secondi Giornalieri Autoclave*/
 	mvprintw(1,13,"[%i/%i][%i]",tab_reg[NPO],tab_reg[SHP],tab_reg[SEGP]); /*Secondi Giornalieri Pozzo*/
 	
-	mvprintw(13,25,"[bar = %1.2f]",(float)tab_reg[70]*0.00244200); /* bar registro 507  del PLC   messo nella posizione 70 del tab_reg */
-	mvprintw(14,25,"[kWh = %4.0f]",(float)kWh);
+	mvprintw(15,25,"[bar = %1.2f]",(float)tab_reg[70]*0.00244200); /* bar registro 507  del PLC   messo nella posizione 70 del tab_reg */
+	mvprintw(16,25,"[kWh = %4.0f]",(float)kWh);
 
 	attron(A_BOLD);
 	/* serratura */ 
@@ -221,8 +221,9 @@ int main (int argc, char ** argv) {
 	attroff(A_BOLD);
 	mvprintw(4,28,"Serratura");
 	
-	attron(A_BOLD);
+	
 	/* apertura totale cancello */
+	attron(A_BOLD);
 	mvprintw(5,26,"N-");
 	attroff(A_BOLD);
 	mvprintw(5,28,"totale cancello");
@@ -232,20 +233,37 @@ int main (int argc, char ** argv) {
 	mvprintw(6,26,"P-");
 	attroff(A_BOLD);
 	mvprintw(6,28,"parziale cancello");
-	attron(A_BOLD);
 
-	/* Fari LED esterni  */
+
+	/* Fari LED esterni SOPRA */
+	attron(A_BOLD);
 	mvprintw(7,26,"R-");
 	attroff(A_BOLD);
-	if (otb_in[0] & (1<<FARI_ESTERNI_IN)) {
+	if (otb_in[0] & (1<<FARI_ESTERNI_IN_SOPRA)) { // bit num 0
 	  attron(COLOR_PAIR(1));
-	  mvprintw(7,28,"fari esterni");
+	  mvprintw(7,28,"fari esterni SOPRA");
 	  attroff(COLOR_PAIR(1));
 	} else {
 	  attron(COLOR_PAIR(0));
-	  mvprintw(7,28,"fari esterni");
+	  mvprintw(7,28,"fari esterni SOPRA");
 	  attroff(COLOR_PAIR(0));
 	}
+
+	/* Fari LED esterni SOTTO */
+	attron(A_BOLD);
+	mvprintw(8,26,"S-");
+	attroff(A_BOLD);
+	if (otb_in[0] & (1<<FARI_ESTERNI_IN_SOTTO)) { // bit num 1
+	  attron(COLOR_PAIR(1));
+	  mvprintw(8,28,"fari esterni SOTTO");
+	  attroff(COLOR_PAIR(1));
+	} else {
+	  attron(COLOR_PAIR(0));
+	  mvprintw(8,28,"fari esterni SOTTO");
+	  attroff(COLOR_PAIR(0));
+	}
+
+
 	refresh();
 	ch=getch();
 	switch (ch) {
@@ -294,7 +312,11 @@ int main (int argc, char ** argv) {
 	    cont=0;  }
 	  break;
 	case 'r':
-	  if ( interruttore(mb_otb,FARI_ESTERNI,otb_out[0]) !=0) {
+	  if ( interruttore(mb_otb,FARI_ESTERNI_SOPRA,otb_out[0]) !=0) {
+	    cont=0;  }
+	  break;
+	case 's':
+	  if ( interruttore(mb_otb,FARI_ESTERNI_SOTTO,otb_out[0]) !=0) {
 	    cont=0;  }
 	  break;
      	case 'q':
