@@ -1,7 +1,6 @@
 .SUFFIXES : .o.c
 
 CC = gcc
-
 # librerie e include per modbus
 INCDIR = /home/reario/include
 LIBDIR = /home/reario/lib
@@ -9,7 +8,6 @@ LIBDIR = /home/reario/lib
 # librerie e include per postgres
 LIBDB = /usr/local/pgsql/lib
 DBINCDIR = /usr/include/postgresql/
-
 
 objs = value.o operate.o setplctime.o
 op = operate.o bit.o
