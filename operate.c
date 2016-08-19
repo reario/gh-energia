@@ -115,12 +115,22 @@ int main (int argc, char ** argv) {
     
     /* name resolution and connection to modbus device */
     hp=gethostbyname(HOST);
+    if (!hp) {
+      printf("errore gethostbyname %d\n",h_errno);
+      exit(1);
+	  }
     mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
     mb_otb = modbus_new_tcp("192.168.1.11",PORT);
+
+
+    //    if (modbus_connect(mb) == -1) {printf("errore di connessione al PLC\n");exit(1);}
+    //if (modbus_connect(mb_otb) == -1) {printf("errore di connessione a OTB\n");exit(1);}
 
     attron(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
     /* faccio la connessione */
     if ( (modbus_connect(mb) == -1) || (modbus_connect(mb_otb) == -1) ) {
+
+      printf("ERRORE\n");exit(1);
       attroff(COLOR_PAIR(1));
       attron(COLOR_PAIR(3));
       mvprintw(0,col-4,"C");

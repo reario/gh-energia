@@ -2,7 +2,7 @@
 per server all'esterno di GH 
 */
 
-#define HOST "giannini.homeip.net"
+#define HOST "giannini.dynu.com"
 #define PORT 502
 
 /*
