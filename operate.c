@@ -113,13 +113,14 @@ int main (int argc, char ** argv) {
     curs_set(0);
     getmaxyx(stdscr,row,col);
     
-    /* name resolution and connection to modbus device */
+    /* name resolution and connection to modbus device  */
     hp=gethostbyname(HOST);
     if (!hp) {
       printf("errore gethostbyname %d\n",h_errno);
       exit(1);
 	  }
     mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
+    //mb = modbus_new_tcp( "192.168.1.157", PORT);
     mb_otb = modbus_new_tcp("192.168.1.11",PORT);
 
 
@@ -130,7 +131,7 @@ int main (int argc, char ** argv) {
     /* faccio la connessione */
     if ( (modbus_connect(mb) == -1) || (modbus_connect(mb_otb) == -1) ) {
 
-      printf("ERRORE\n");exit(1);
+      printf("ERRORE\n");
       attroff(COLOR_PAIR(1));
       attron(COLOR_PAIR(3));
       mvprintw(0,col-4,"C");
@@ -138,6 +139,7 @@ int main (int argc, char ** argv) {
       ERRORI=ERRORI+1;
       mvprintw(0,col-3,"%d",ERRORI);
       refresh();
+      exit(1);
     } else {
       attroff(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
       attron(COLOR_PAIR(1));mvprintw(1,col-4,"R");refresh();
