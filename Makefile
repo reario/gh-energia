@@ -12,7 +12,7 @@ DBINCDIR = /usr/include/postgresql/
 objs = value.o operate.o setplctime.o
 op = operate.o bit.o
 
-all: value operate setplctime event ss #enum secondi scatti myserver
+all: value operate setplctime event ss readtime #enum secondi scatti myserver
 
 value:  pgdb.o value.o
 	$(CC) -Wall -L${LIBDB} -L${LIBDIR} -lmodbus -lpq $^ -o $@
@@ -21,6 +21,9 @@ operate: bit.o operate.o
 	$(CC) -Wall -L${LIBDIR} -lmodbus -lncurses $^ -o $@
 
 setplctime: setplctime.o
+	$(CC) -Wall  -L${LIBDIR} -lmodbus $^ -o $@
+
+readtime: readtime.o
 	$(CC) -Wall  -L${LIBDIR} -lmodbus $^ -o $@
 
 ss: pgdb.o ss.o
@@ -36,7 +39,7 @@ event: event.o
 
 # cancella i file non necessari e pulisce la directory, pronta per una compilazione pulita
 clean :
-	rm -f *~ *.o *.i *.s *.core value operate scatti secondi setplctime myserver event enum
+	rm -f *~ *.o *.i *.s *.core readtime value operate scatti secondi setplctime myserver event enum
 
 
 

@@ -19,21 +19,6 @@ int sethour (modbus_t *m,int addr, int nreg, const uint16_t *valori) {
   return 0;
 }
 
-int readtime (modbus_t *m, int addr, int nreg, uint16_t *valori, char *s) {
-  int i;
-  if ( modbus_read_registers(m,addr,nreg,valori) != nreg ) {
-    printf("ERRORE DI SCRITTURA hour\n");
-    return -1;
-  }
-
- for (i=0;i<nreg;i++){ 
-   printf("%s %i",s,valori[i]); 
- } 
- printf("\n");
-
-  return 0;
-}
-
 int bcd2int(unsigned int bcd)
 {
   int pos = sizeof(bcd) * 8;
@@ -48,7 +33,6 @@ int bcd2int(unsigned int bcd)
 
   return val;
 }
-
 int setsinglebit(modbus_t *m, int bobina, int valore) {
   if ( modbus_write_bit(m,bobina,valore) != 1 ) {
     printf("ERRORE DI SCRITTURA bit %i",bobina);
@@ -56,6 +40,31 @@ int setsinglebit(modbus_t *m, int bobina, int valore) {
   }
   return 0;
 }
+
+
+int readtime (modbus_t *m) {
+  int rc;
+  uint16_t valori[5],oremin,ore,min,giornomese,giorno,mese;
+  char *giornisettimana[]={"lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"};
+  rc=modbus_read_registers(m,11,5,valori);
+  if (  rc==-1 ) {
+    printf("ERRORE DI LETTURA TIME\n");
+    return -1;
+  }
+  oremin=valori[2];
+  giornomese=valori[3];
+
+  ore=(uint16_t)(oremin & (uint16_t)65280)>>(uint16_t)8;
+  min=(uint16_t)(oremin & (uint16_t)255);
+
+  mese=(uint16_t)(giornomese & (uint16_t)65280)>>(uint16_t)8;
+  giorno=(uint16_t)(giornomese & (uint16_t)255);
+
+  printf("Data PLC --> %s, %02d/%02d/%d, ore %02i:%02i:%02i\n",giornisettimana[bcd2int(valori[0]-1)], giorno,mese,bcd2int(valori[4]), bcd2int(ore),bcd2int(min),bcd2int(valori[1]));
+
+ return 0;
+}
+
 
 int setval (modbus_t *m, int addr, int  valore) {
   if ( modbus_write_register(m,addr,valore) < 0 ) {
@@ -120,17 +129,16 @@ Esempio:
     /* prende la data */
     tm = time(NULL);
     ptr = localtime(&tm);
-    
+    readtime(mb);    
     setval(mb,76,ptr->tm_sec );
     setval(mb,77,ptr->tm_hour*100+ptr->tm_min ); /* ore:minuti es. 1252: ore 12 e 52 minuti*/
-    printf("Data ora-> %d/%d/%d %d\n",ptr->tm_mday,ptr->tm_mon+1,ptr->tm_year+1900,ptr->tm_hour*100+ptr->tm_min);
+    printf("Data impostata --> %d/%d/%d %d\n",ptr->tm_mday,ptr->tm_mon+1,ptr->tm_year+1900,ptr->tm_hour*100+ptr->tm_min);
     /* commit: on the rising edge it set %S50 and time is equal to the content of %MW76 and %MW77. With %S50=1 time is updatable. 
        On the falling edge it reset %S50. With %S50=0 time is no more updatable  
        Reset of %MW95 is done on PLC so is not necessary to set it to 0 here. This is why here we are only setting %M95 to TRUE. 
     */
 
     if (setsinglebit(mb,95,TRUE)==0) {;
-
       printf("SCRITTO\n");
     } else {
       printf("ERRORE nella scrittura del bit 95 sul PLC. Ora NON aggiornata");
