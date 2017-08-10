@@ -60,7 +60,7 @@ int readtime (modbus_t *m) {
   mese=(uint16_t)(giornomese & (uint16_t)65280)>>(uint16_t)8;
   giorno=(uint16_t)(giornomese & (uint16_t)255);
 
-  printf("Data PLC --> %s, %02d/%02d/%d, ore %02i:%02i:%02i\n",giornisettimana[bcd2int(valori[0]-1)], giorno,mese,bcd2int(valori[4]), bcd2int(ore),bcd2int(min),bcd2int(valori[1]));
+  printf("Data PLC --> %s, %02d/%02d/%d, ore %02i:%02i:%02i\n",giornisettimana[bcd2int(valori[0]-1)], bcd2int(giorno),bcd2int(mese),bcd2int(valori[4]), bcd2int(ore),bcd2int(min),bcd2int(valori[1]));
 
  return 0;
 }
@@ -118,7 +118,7 @@ Esempio:
     hours=ptr->tm_hour
   */
 
-/* name resolution and connection to modbus device */
+  /* name resolution and connection to modbus device */
   hp=gethostbyname("192.168.1.157");
   mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
   /* faccio la connessione */
@@ -126,20 +126,23 @@ Esempio:
     printf("Errore di connessione\n");
   } else {
     printf("Connesso\n");
-    /* prende la data */
+    /* prende la data locale*/
     tm = time(NULL);
     ptr = localtime(&tm);
     readtime(mb);    
     setval(mb,76,ptr->tm_sec );
     setval(mb,77,ptr->tm_hour*100+ptr->tm_min ); /* ore:minuti es. 1252: ore 12 e 52 minuti*/
     printf("Data impostata --> %d/%d/%d %d\n",ptr->tm_mday,ptr->tm_mon+1,ptr->tm_year+1900,ptr->tm_hour*100+ptr->tm_min);
-    /* commit: on the rising edge it set %S50 and time is equal to the content of %MW76 and %MW77. With %S50=1 time is updatable. 
+
+    /* 
+       commit: on the rising edge it set %S50 and time is equal to the content of %MW76 and %MW77. With %S50=1 time is updatable. 
        On the falling edge it reset %S50. With %S50=0 time is no more updatable  
        Reset of %MW95 is done on PLC so is not necessary to set it to 0 here. This is why here we are only setting %M95 to TRUE. 
     */
 
     if (setsinglebit(mb,95,TRUE)==0) {;
       printf("SCRITTO\n");
+      printf("----------------------------------------------\n");
     } else {
       printf("ERRORE nella scrittura del bit 95 sul PLC. Ora NON aggiornata");
     }

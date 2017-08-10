@@ -32,6 +32,9 @@ ss: pgdb.o ss.o
 event: event.o
 	$(CC) -Wall -L${LIBDB} -L${LIBDIR} -lmodbus -lpq -lm $^ -o $@
 
+event-test: event-test.o
+	$(CC) -Wall -L${LIBDB} -L${LIBDIR} -lmodbus -lpq -lm $^ -o $@
+
 
 # vengono costruiti fli object
 .c.o: gh.h
