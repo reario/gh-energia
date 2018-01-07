@@ -541,8 +541,7 @@ int main(void)
 	close_sigint(1);
       }
       
-      /* Run through the existing connections looking for data to be
-       * read */
+      /* Run through the existing connections looking for data to be read */
       for (master_socket = 0; master_socket <= fdmax; master_socket++) {	
 	if (!FD_ISSET(master_socket, &rdset)) {
 	  continue;
@@ -574,29 +573,31 @@ int main(void)
 	      clientaddr.sin_port, 
 	      newfd);
 	    
-                }
+	  }
 	} else {
+	//----------------------
 	  modbus_set_socket(ctx, master_socket);
 	  rc = modbus_receive(ctx, query);
 	  //printf("A client is asking a new connection\n");	  
 	  if (rc > 0) {
-		  modbus_reply(ctx, query, rc, mb_mapping);		    
-		  printf("scritti da plc to pc\n");
-                } else if (rc == -1) {
-		  /*server is ended on connection closing or
-		   * any errors. */
-		  //		   printf("Connection closed on socket %d\n", master_socket);
-		  close(master_socket);
-		  
-		  /* Remove from reference set */
-		  FD_CLR(master_socket, &refset);
-		  
-		  if (master_socket == fdmax) {
-		    fdmax--;
-		  }
-                }
-            }
-        }
+	    modbus_reply(ctx, query, rc, mb_mapping);		    
+	    printf("client ha letto dal registro\n");
+	  } else if (rc == -1) {
+	    /*server is ended on connection closing or
+	     * any errors. */
+	    //		   printf("Connection closed on socket %d\n", master_socket);
+	    close(master_socket);
+	    
+	    /* Remove from reference set */
+	    FD_CLR(master_socket, &refset);
+	    
+	    if (master_socket == fdmax) {
+	      fdmax--;
+	    }
+	  }
+	}
+	//----------------------
+      }
     }
     
     return 0;
