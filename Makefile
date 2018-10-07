@@ -38,7 +38,7 @@ event-test: event-test.o
 
 # vengono costruiti fli object
 .c.o: gh.h
-	$(CC) -c -g -DDOINSERT3 -Wall -I${DBINCDIR} -I$(INCDIR)/modbus $< -o $@
+	$(CC) -c -g -DOTB -DDOINSERT3 -Wall -I${DBINCDIR} -I$(INCDIR)/modbus $< -o $@
 
 # cancella i file non necessari e pulisce la directory, pronta per una compilazione pulita
 clean :

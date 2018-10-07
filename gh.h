@@ -4,7 +4,7 @@ per server all'esterno di GH
 
 #define HOST "giannini.dynu.com"
 #define PORT 502
-
+//#define HOST 192.168.1.157
 /*
 per server dentro GH
  */

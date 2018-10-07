@@ -22,6 +22,7 @@ if command is OFF and Qi>10 then all Qi will be reset
 #include <errno.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <errno.h>
 #include <modbus.h>
 #include <arpa/inet.h>
 #include "gh.h"
@@ -30,6 +31,9 @@ if command is OFF and Qi>10 then all Qi will be reset
 
 int row,col;
 
+/*
+#define OTB
+*/
 
 int pulsante(modbus_t *m,int bobina) {
   attron(COLOR_PAIR(1));mvprintw(2,col-4,"W");refresh();
@@ -67,16 +71,19 @@ int interruttore(modbus_t *m, int bit, uint16_t reg) {
 int main (int argc, char ** argv) {
 
   modbus_t *mb;
+#ifdef OTB
   modbus_t *mb_otb;
+#endif
   struct hostent *hp;
   int i,ch;
   int cont=1;
 
 
   uint16_t tab_reg[100]; /* vengono allocati 100  spazi anche se se ne utilizzano meno */
+#ifdef OTB
   uint16_t otb_in[10];
   uint16_t otb_out[10];
-
+#endif
   int nregs=69; /* 70 registri */
   int addr=7; /* offset */
 
@@ -118,20 +125,49 @@ int main (int argc, char ** argv) {
     if (!hp) {
       printf("errore gethostbyname %d\n",h_errno);
       exit(1);
-	  }
-    mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
-    //mb = modbus_new_tcp( "192.168.1.157", PORT);
-    mb_otb = modbus_new_tcp("192.168.1.11",PORT);
+    }
 
+    mb = modbus_new_tcp("192.168.1.157",PORT);
+    //    mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
+    //    mb = modbus_new_tcp( "192.168.1.157", PORT);
+
+#ifdef OTB
+    mb_otb = modbus_new_tcp("192.168.1.11",PORT);
+#endif
 
     //    if (modbus_connect(mb) == -1) {printf("errore di connessione al PLC\n");exit(1);}
-    //if (modbus_connect(mb_otb) == -1) {printf("errore di connessione a OTB\n");exit(1);}
+    //    if (modbus_connect(mb_otb) == -1) {printf("errore di connessione a OTB\n");exit(1);}
+
+/*
+#ifdef OTB
+    if (modbus_connect(mb_otb) == -1) {
+      printf("ERRORE non riesco a connettermi con OTB\n");
+      fprintf(stderr,"connection failed--> %s\n",modbus_strerror(errno));
+      exit(1);
+    }
+#endif
+
+    if (modbus_connect(mb) == -1) {
+      printf("ERRORE non riesco a connettermi con PLC\n"); 
+      fprintf(stderr,"connection failed--> %s\n",modbus_strerror(errno));
+      exit(1);
+      //      exit(1);
+    }
+    */
 
     attron(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
     /* faccio la connessione */
-    if ( (modbus_connect(mb) == -1) || (modbus_connect(mb_otb) == -1) ) {
+    if ( (modbus_connect(mb) == -1) 
 
-      printf("ERRORE\n");
+#ifdef OTB	 
+	 || (modbus_connect(mb_otb) == -1) 
+#endif
+
+    ) 
+
+      {
+
+      printf("ERRORE non riesco a connettermi con il PLC\n");
       attroff(COLOR_PAIR(1));
       attron(COLOR_PAIR(3));
       mvprintw(0,col-4,"C");
@@ -147,9 +183,13 @@ int main (int argc, char ** argv) {
       /* leggo stato degli ingressi e i dati del PM9*/
       /* || (modbus_read_registers(mb, 75, 1, tab_reg+68) < 0) */
       if ( (modbus_read_registers(mb, addr, nregs, tab_reg) < 0) || 
-	   (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0) ||
+	   (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0) 
+#ifdef OTB
+           ||
 	   (modbus_read_registers(mb_otb, 0, 3, otb_in) < 0) ||
 	   (modbus_read_registers(mb_otb, 100, 3, otb_out) < 0)
+#endif
+
       ) 
 	{
 	attroff(COLOR_PAIR(1));
@@ -246,7 +286,7 @@ int main (int argc, char ** argv) {
 	attroff(A_BOLD);
 	mvprintw(6,28,"parziale cancello");
 
-
+#ifdef OTB
 	/* Fari LED esterni SOPRA */
 	attron(A_BOLD);
 	mvprintw(7,26,"R-");
@@ -274,7 +314,7 @@ int main (int argc, char ** argv) {
 	  mvprintw(8,28,"fari esterni SOTTO");
 	  attroff(COLOR_PAIR(0));
 	}
-
+#endif
 
 	refresh();
 	ch=getch();
@@ -323,6 +363,8 @@ int main (int argc, char ** argv) {
 	  if ( pulsante(mb,APERTURA_PARZIALE) !=0) {
 	    cont=0;  }
 	  break;
+
+#ifdef OTB
 	case 'r':
 	  if ( interruttore(mb_otb,FARI_ESTERNI_SOPRA,otb_out[0]) !=0) {
 	    cont=0;  }
@@ -331,6 +373,7 @@ int main (int argc, char ** argv) {
 	  if ( interruttore(mb_otb,FARI_ESTERNI_SOTTO,otb_out[0]) !=0) {
 	    cont=0;  }
 	  break;
+#endif
      	case 'q':
 	  cont=0;
 	  break;
@@ -344,10 +387,10 @@ int main (int argc, char ** argv) {
 
     modbus_close(mb);
     modbus_free(mb);
-
+#ifdef OTB
     modbus_close(mb_otb);
     modbus_free(mb_otb);
-
+#endif
     refresh();
     delwin(energia);
     endwin();
