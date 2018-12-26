@@ -20,6 +20,9 @@ value:  pgdb.o value.o
 operate: bit.o operate.o
 	$(CC) -Wall -L${LIBDIR} -lmodbus -lncurses $^ -o $@
 
+faretti: bit.o faretti.o
+	$(CC) -Wall -L${LIBDIR} -lmodbus $^ -o $@
+
 setplctime: setplctime.o
 	$(CC) -Wall  -L${LIBDIR} -lmodbus $^ -o $@
 
@@ -42,7 +45,7 @@ event-test: event-test.o
 
 # cancella i file non necessari e pulisce la directory, pronta per una compilazione pulita
 clean :
-	rm -f *~ *.o *.i *.s *.core readtime value operate scatti secondi setplctime myserver event enum
+	rm -f *~ *.o *.i *.s *.core faretti readtime value operate scatti secondi setplctime myserver event enum
 
 
 

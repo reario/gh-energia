@@ -81,9 +81,9 @@ void printbitssimple(uint16_t n) {
   i = 1<<(sizeof(n) * 8 - 1); /* 2^n */
   while (i > 0) {
     if (n & i)
-      printw("1");
+      printf("1");
     else
-      printw("0");
+      printf("0");
     i >>= 1;
   }
   printf("\n");

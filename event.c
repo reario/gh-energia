@@ -1,6 +1,8 @@
 /*
-  Questo programma scrive nel DB postgres sulla macchina 192.168.1.103 (vedi parametro  CONN) i valori degli eventi I/O digitali che si verificano.
-  Esso inoltre acquisisce i valori di tensione, corrente e potenza nonchè i valori degli I/O digitali dell'OTB e dei valori pressione pozzo e autoclave. 
+  Questo programma scrive nel DB postgres sulla macchina 192.168.1.103 (vedi parametro  CONN) i valori degli eventi 
+  I/O digitali che si verificano.
+  Esso inoltre acquisisce i valori di tensione, corrente e potenza nonchè i valori degli I/O digitali dell'OTB e dei 
+  valori pressione pozzo e autoclave. 
 */
 
 #include <stdio.h>
