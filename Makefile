@@ -23,10 +23,6 @@ operate: bit.o operate.o
 faretti: bit.o faretti.o
 	$(CC) -Wall -L${LIBDIR} -lmodbus $^ -o $@
 
-faretti-new: bit.o faretti-new.o
-	$(CC) -Wall -L${LIBDIR} -lmodbus $^ -o $@
-
-
 setplctime: setplctime.o
 	$(CC) -Wall  -L${LIBDIR} -lmodbus $^ -o $@
 
@@ -36,7 +32,7 @@ readtime: readtime.o
 ss: pgdb.o ss.o
 	$(CC) -Wall -L${LIBDB} -L${LIBDIR} -lmodbus -lpq $^ -o $@
 
-t: t.o
+t: bit.o t.o
 	$(CC) -Wall -L${LIBDB} -L${LIBDIR} -lmodbus $^ -o $@
 
 event: event.o

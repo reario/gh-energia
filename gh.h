@@ -146,10 +146,29 @@ struct item input[]={ {' ', "Autoclave"},
 #define SERRATURA_PORTONE 12 /* %M12 */
 #define APERTURA_PARZIALE 96 /* %M96 */
 #define APERTURA_TOTALE 97 /* %M97 */
-#define FARI_ESTERNI_SOPRA 0 /* 0-esimo bit dell'uscita dell'OTB Q0*/
-#define FARI_ESTERNI_SOTTO 1 /* 1-esimo bit dell'uscita dell'OTB Q0*/
+/* OTB USCITE registro posizione 0 a partire dal registro 100 */ 
+#define FARI_ESTERNI_SOPRA 0 /* 0-esimo bit dell'uscita dell'OTB Q0 */
+#define FARI_ESTERNI_SOTTO 1 /* 1-esimo bit dell'uscita dell'OTB Q1 */
+#define OTB_Q2 2 /* 2-esimo bit dell'uscita dell'OTB Q2 */
+#define OTB_Q3 3 /* 3-esimo bit dell'uscita dell'OTB Q3 */
+#define OTB_Q4 4 /* 4-esimo bit dell'uscita dell'OTB Q4 */
+#define OTB_Q5 5 /* 5-esimo bit dell'uscita dell'OTB Q5 */
+#define OTB_Q6 6 /* 6-esimo bit dell'uscita dell'OTB Q6 */
+#define OTB_Q7 7 /* 7-esimo bit dell'uscita dell'OTB Q7 */
+/* OTB INGRESSI registro posizione 0 a partire dal registro 0 */
 #define FARI_ESTERNI_IN_SOPRA 11 /* 11-esimo bit dell'ingresso dell'OTB IN11*/
 #define FARI_ESTERNI_IN_SOTTO 10 /* 10-esimo bit dell'ingresso dell'OTB IN11*/
+#define OTB_IN9 9 /* 9-esimo bit dell'ingresso dell'OTB IN09 */
+#define OTB_IN8 8 /* 8-esimo bit dell'ingresso dell'OTB IN08 */
+#define OTB_IN7 7 /* 7-esimo bit dell'ingresso dell'OTB IN07 */
+#define OTB_IN6 6 /* 6-esimo bit dell'ingresso dell'OTB IN06 */
+#define OTB_IN5 5 /* 5-esimo bit dell'ingresso dell'OTB IN05 */
+#define OTB_IN4 4 /* 4-esimo bit dell'ingresso dell'OTB IN04 */
+#define OTB_IN3 3 /* 3-esimo bit dell'ingresso dell'OTB IN03 */
+#define OTB_IN2 2 /* 2-esimo bit dell'ingresso dell'OTB IN02 */
+#define OTB_IN1 1 /* 1-esimo bit dell'ingresso dell'OTB IN01 */
+#define OTB_IN0 0 /* 0-esimo bit dell'ingresso dell'OTB IN00 */
+
 /* Cicalini */
 #define CICALINO_AUTOCLAVE 60 /* %M60 */
 #define CICALINO_POMPA_POZZO 61 /* %M61 */
