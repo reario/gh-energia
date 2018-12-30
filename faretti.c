@@ -142,7 +142,8 @@ int main (int argc, char ** argv) {
     } 
   } 
   /******************************************************************/
-  if (aflag) {
+  if (aflag == 1) {
+    printf("--- aflag ---\n");
     if (operate(mb_otb, // modbus contex
 		otb_in, // in array di registri INGRESSI (Analogici, Digitali)
 		otb_out, // out array di registri USCITE (Analogiche, Digitali)
