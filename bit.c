@@ -42,7 +42,6 @@ That will put the value of bit x into the variable bit
 #include <stdlib.h>
 #include <errno.h>
 #include <netdb.h>
-#include <ncurses.h>
 
 void usage() {
   printf("use: operate [on|off|invert|read]\n");

@@ -26,6 +26,7 @@ operate
 setplctime
 enum
 log/*
+dump/*
 postgres/capacity/*
 libmodbus/*
 #emacs
