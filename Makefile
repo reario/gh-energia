@@ -37,8 +37,7 @@ t: bit.o t.o
 
 event: event.o
 	$(CC) -Wall -L${LIBDB} -L${LIBDIR} -lmodbus -lpq -lm $^ -o $@
-
-event-test: event-test.o
+sample: sample.o
 	$(CC) -Wall -L${LIBDB} -L${LIBDIR} -lmodbus -lpq -lm $^ -o $@
 
 
@@ -48,7 +47,7 @@ event-test: event-test.o
 
 # cancella i file non necessari e pulisce la directory, pronta per una compilazione pulita
 clean :
-	rm -f *~ *.o *.i *.s *.core faretti readtime value operate scatti secondi setplctime myserver event enum
+	rm -f *~ *.o *.i *.s *.core sample faretti readtime value operate scatti secondi setplctime myserver event enum
 
 
 
