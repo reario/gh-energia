@@ -331,10 +331,9 @@ int main (int argc, char ** argv) {
     }
     
   }
-  //  delwin(energia);
+  //  delwin(energia); crea un core dump
   refresh();
   endwin();      
-
 
   
   return 0;
