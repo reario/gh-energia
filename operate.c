@@ -131,37 +131,6 @@ int main (int argc, char ** argv) {
   mb_otb = modbus_new_tcp("192.168.1.11",PORT);
   attron(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
   /* faccio la connessione */
-<<<<<<< HEAD
-  if ( (modbus_connect(mb) == -1) 
-#ifdef OTB	 
-       || (modbus_connect(mb_otb) == -1) 
-#endif
-
-  )
-    {
-      printf("ERRORE non riesco a connettermi con il PLC\n");
-      attroff(COLOR_PAIR(1));
-      attron(COLOR_PAIR(3));
-      mvprintw(0,col-4,"C");
-      attroff(COLOR_PAIR(3));refresh();
-      ERRORI=ERRORI+1;
-      mvprintw(0,col-3,"%d",ERRORI);
-      refresh();
-      fprintf(stderr,"connection failed--> %s\n",modbus_strerror(errno));
-      exit(1);
-
-    } else {
-    
-    while (cont) {
-      attroff(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
-      attron(COLOR_PAIR(1));mvprintw(1,col-4,"R");refresh();	
-      /* leggo stato degli ingressi e i dati del PM9*/
-      /* || (modbus_read_registers(mb, 75, 1, tab_reg+68) < 0) */
-      if ( (modbus_read_registers(mb, addr, nregs, tab_reg) < 0) || 
-	   (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0) 
-#ifdef OTB
-	   ||
-=======
   while (cont) {
 
     if ( (modbus_connect(mb) == 0)  && (modbus_connect(mb_otb) == 0) )
@@ -172,7 +141,6 @@ int main (int argc, char ** argv) {
 	/* || (modbus_read_registers(mb, 75, 1, tab_reg+68) < 0) */
 	if ( (modbus_read_registers(mb, addr, nregs, tab_reg) < 0) || 
 	     (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0) ||
->>>>>>> fa614ed19fef7f111cdb3e2edec7fc6bd330d39a
 	   (modbus_read_registers(mb_otb, 0, 3, otb_in) < 0) ||
 	   (modbus_read_registers(mb_otb, 100, 3, otb_out) < 0)    ) 
 	{
@@ -338,10 +306,6 @@ int main (int argc, char ** argv) {
 	    if ( pulsante(mb,APERTURA_PARZIALE) !=0) {
 	      cont=0;  }
 	    break;
-<<<<<<< HEAD
-#ifdef OTB
-=======
->>>>>>> fa614ed19fef7f111cdb3e2edec7fc6bd330d39a
 	  case 'r':
 	    if ( interruttore(mb_otb,FARI_ESTERNI_SOPRA,otb_out[0]) !=0) {
 	      cont=0;  }
@@ -354,22 +318,6 @@ int main (int argc, char ** argv) {
 	    cont=0;
 	    break;
 	  }
-<<<<<<< HEAD
-	} /* else interno che wrappa il read_register */
- } /* else esterno che wrappa il connect*/
-      
-    sleep(1);
- } /*else*/
-    modbus_close(mb);
-    modbus_free(mb);
-#ifdef OTB
-    modbus_close(mb_otb);
-    modbus_free(mb_otb);
-#endif
-    refresh();
-    delwin(energia);
-    endwin();      
-=======
 	}
 	usleep(300000);
 	modbus_close(mb);
@@ -386,7 +334,7 @@ int main (int argc, char ** argv) {
   //  delwin(energia);
   refresh();
   endwin();      
->>>>>>> fa614ed19fef7f111cdb3e2edec7fc6bd330d39a
+
 
   
   return 0;
