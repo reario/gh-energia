@@ -132,6 +132,7 @@ int main (int argc, char ** argv) {
   attron(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
   /* faccio la connessione */
   while (cont) {
+
     if ( (modbus_connect(mb) == 0)  && (modbus_connect(mb_otb) == 0) )
       {
 	attroff(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
