@@ -153,7 +153,9 @@ int main (int argc, char ** argv) {
       refresh();
       fprintf(stderr,"connection failed--> %s\n",modbus_strerror(errno));
       exit(1);
+
     } else {
+    
     while (cont) {
       attroff(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
       attron(COLOR_PAIR(1));mvprintw(1,col-4,"R");refresh();	
@@ -336,7 +338,6 @@ int main (int argc, char ** argv) {
 	    if ( pulsante(mb,APERTURA_PARZIALE) !=0) {
 	      cont=0;  }
 	    break;
-
 #ifdef OTB
 	  case 'r':
 	    if ( interruttore(mb_otb,FARI_ESTERNI_SOPRA,otb_out[0]) !=0) {
@@ -352,12 +353,10 @@ int main (int argc, char ** argv) {
 	    break;
 	  }
 	} /* else interno che wrappa il read_register */
-
-      } /* else esterno che wrappa il connect*/
-
+ } /* else esterno che wrappa il connect*/
       
-      sleep(1);
-    } /*while*/
+    sleep(1);
+ } /*else*/
     modbus_close(mb);
     modbus_free(mb);
 #ifdef OTB

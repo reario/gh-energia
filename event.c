@@ -39,7 +39,6 @@ PLC
 #define I0_16 65 /* word che contiene lo stato degli input 0-16*/
 #define I16_32 66 /* word che contiene lo stato degli input 16-32 */
 #define Q0_32 67 /* word che contiene lo stato degli output 0-32*/
-
 /*
 OTB
  */
@@ -530,8 +529,7 @@ int main(void)
     mb_mapping = modbus_mapping_new(500,500,500,500);
 
     if (mb_mapping == NULL) {
-        fprintf(stderr, "Failed to allocate the mapping: %s\n",
-                modbus_strerror(errno));
+        fprintf(stderr, "Failed to allocate the mapping: %s\n",modbus_strerror(errno));
         modbus_free(ctx);
         return -1;
     }
@@ -600,72 +598,72 @@ int main(void)
 	  rc = modbus_receive(ctx, query);
 	  //	  printf("A client is asking a new connection\n");	  
 	  if (rc > 0) {
-		  modbus_reply(ctx, query, rc, mb_mapping);		    
-		  /***********************************************************************************/
-		  /* a questo punto il PLC ha scritto tutti i registri: 65 66 67 (I/O), 68,69 (I) 70,71 (V) 72,73 (P) .......... */
-		  int offset = modbus_get_header_length(ctx);
-		  uint16_t x=0;
-		  /***** Estraggo il codice richiesta *****/
-		  uint16_t address = (query[offset + 1]<< 8) + query[offset + 2];		  
-		  
-		  switch (query[offset]) {
-		  case 0x05: {/* il PLC sta chiedendo di scrivere BITS */		      
-		    printf("Coil Registro %d-->%s [0x%02X]\n",address,(mb_mapping->tab_bits[address])?"ON":"OFF",query[offset]);     
+	    modbus_reply(ctx, query, rc, mb_mapping);		    
+	    /***********************************************************************************/
+	    /* a questo punto il PLC ha scritto tutti i registri: 65 66 67 (I/O), 68,69 (I) 70,71 (V) 72,73 (P) .......... */
+	    int offset = modbus_get_header_length(ctx);
+	    uint16_t x=0;
+	    /***** Estraggo il codice richiesta *****/
+	    uint16_t address = (query[offset + 1]<< 8) + query[offset + 2];		  
+	    
+	    switch (query[offset]) {
+	    case 0x05: {/* il PLC sta chiedendo di scrivere BITS */		      
+	      printf("Coil Registro %d-->%s [0x%02X]\n",address,(mb_mapping->tab_bits[address])?"ON":"OFF",query[offset]);     
+	    }
+	      break;
+	    case 0x10:
+	    case 0x06: {/* il PLC sta chiedendo di scrivere N registri  */
+	      
+	      /*------------------- PLC IN--------------------------------------*/		  
+	      in1=mb_mapping->tab_registers[I0_16]; /* 65 */
+	      in2=mb_mapping->tab_registers[I16_32]; /* 66 */
+	      in3=mb_mapping->tab_registers[80]; /* Ingressi Modulo esterno del PLC TM2... (80) */
+	      
+	      /*------------------- OTB DIGITAL IN------------------------------*/
+	      otb_din=mb_mapping->tab_registers[OTBDIN];
+	      inlong=0;
+	      
+	      inlong=place(inlong,in1,0);      // 0-15
+	      inlong=place(inlong,in2,16);     // 16-22
+	      inlong=place(inlong,in3,23);     // 23-38
+	      inlong=place(inlong,otb_din,39); // 39-50
+	      
+	      diff= inlong^inprev; /* xor: ogni 1 in diff significa che l'input è cambiato */
+	      
+	      if (diff) {		    
+		for (x=0;x < QWORD; x++) {
+		  if (diff & ((uint64_t)1<<x)) { /* ho trovato 1 nella posizione x-esima di diff*/
+		    /*
+		      Vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
+		      diff contiene 1 se lo stato del bit e' cambiato.
+		      Che transizione è avvenuta? da on a off o da off a on?
+		      se il bit x-esimo di *inlong* (vettore attuale degli ingressi) è 1 allora c'è stata la transizione da off a on.
+		      se il bi x-esimo è di *inlong* è 0 allora c'è stata la transizione da on a off
+		    */
+		    printf("%s %i [%lld] %s \n",inputs_names[x],x, (inprev & ((uint64_t)1<<x)),(inprev & ((uint64_t)1<<x))==0 ? "ON" : "OFF");
+		    if (insert3(inputs_names[x],(inprev & ((uint64_t)1<<x)),x) == 1) {
+		      printf("db error\n");
+		    }
+		    // printf("%s\t%s\n",inputs_names[x],(inprev & (1<<x))?"OFF":"ON");			  
 		  }
-		    break;
-		  case 0x10:
-		  case 0x06: {/* il PLC sta chiedendo di scrivere N registri  */
-
-		    /*------------------- PLC IN--------------------------------------*/		  
-		    in1=mb_mapping->tab_registers[I0_16]; /* 65 */
-		    in2=mb_mapping->tab_registers[I16_32]; /* 66 */
-		    in3=mb_mapping->tab_registers[80]; /* Ingressi Modulo esterno del PLC TM2... (80) */
-		    
-		    /*------------------- OTB DIGITAL IN------------------------------*/
-		    otb_din=mb_mapping->tab_registers[OTBDIN];
-		    inlong=0;
-
-		    inlong=place(inlong,in1,0);      // 0-15
-		    inlong=place(inlong,in2,16);     // 16-22
-		    inlong=place(inlong,in3,23);     // 23-38
-		    inlong=place(inlong,otb_din,39); // 39-50
-
-		    diff= inlong^inprev; /* xor: ogni 1 in diff significa che l'input è cambiato */
-
-		    if (diff) {		    
-		      for (x=0;x < QWORD; x++) {
-			if (diff & ((uint64_t)1<<x)) { /* ho trovato 1 nella posizione x-esima di diff*/
-			  /*
-			    Vado ad analizzare se l'1 trovato è relativo ad una transizione 1->0 o 0->1 
-			    diff contiene 1 se lo stato del bit e' cambiato.
-			    Che transizione è avvenuta? da on a off o da off a on?
-			    se il bit x-esimo di *inlong* (vettore attuale degli ingressi) è 1 allora c'è stata la transizione da off a on.
-			    se il bi x-esimo è di *inlong* è 0 allora c'è stata la transizione da on a off
-			  */
-			  printf("%s %i [%lld] %s \n",inputs_names[x],x, (inprev & ((uint64_t)1<<x)),(inprev & ((uint64_t)1<<x))==0 ? "ON" : "OFF");
-			  if (insert3(inputs_names[x],(inprev & ((uint64_t)1<<x)),x) == 1) {
-			    printf("db error\n");
-			  }
-			  // printf("%s\t%s\n",inputs_names[x],(inprev & (1<<x))?"OFF":"ON");			  
-			}
-		      }
-		      inprev=inlong;		      
-		    } /* if (diff) */
-
-		    /*-----------------------------------------------------------*/
-		    /*----------------------- V,A,P -----------------------------*/
-		    /*-----------------------------------------------------------*/
-		    /*
-		      68,69 - IL e IH corrente (reg 7 e 8 del plc)
-		      70,71 - VL e VH tensione (reg 21 e 22 del plc)
-		      72,73 - PL e PH potenza  (reg 29 e 30 del plc)
-		     */
-
+		}
+		inprev=inlong;		      
+	      } /* if (diff) */
+	      
+	      /*-----------------------------------------------------------*/
+	      /*----------------------- V,A,P -----------------------------*/
+	      /*-----------------------------------------------------------*/
+	      /*
+		68,69 - IL e IH corrente (reg 7 e 8 del plc)
+		70,71 - VL e VH tensione (reg 21 e 22 del plc)
+		72,73 - PL e PH potenza  (reg 29 e 30 del plc)
+	      */
+	      
 #ifdef CUMULATIVE		     			    
-		    /*
-		     per adesso non vengono usate
-		     */
-		    V=(float)((mb_mapping->tab_registers[70]<<16)+mb_mapping->tab_registers[71])/1000;
+	      /*
+		per adesso non vengono usate
+	      */
+	      V=(float)((mb_mapping->tab_registers[70]<<16)+mb_mapping->tab_registers[71])/1000;
 		    I=(float)((mb_mapping->tab_registers[68]<<16)+mb_mapping->tab_registers[69])/1000;
 		    P=(float)((mb_mapping->tab_registers[72]<<16)+mb_mapping->tab_registers[73])/100;
 		    		    
