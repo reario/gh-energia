@@ -27,10 +27,12 @@ echo $HOST
 
 ######################################################################
 # dump tables
-# echo "dumping energia...."
+echo "dumping energia...."
 /usr/bin/pg_dump -t public.energia --clean --if-exists -h localhost -d reario_db --role=reario | /usr/bin/psql -U reario -d reario_db -h $HOST -p 5432
 echo "dumping events....."
 /usr/bin/pg_dump -t public.events --clean --if-exists -h localhost -d reario_db --role=reario | /usr/bin/psql -U reario -d reario_db -h $HOST -p 5432
+echo "dumping sample...."
+/usr/bin/pg_dump -t public.vaw --clean --if-exists -h localhost -d reario_db --role=reario | /usr/bin/psql -U reario -d reario_db -h $HOST -p 5432
 echo "dumping ss...."
 /usr/bin/pg_dump -t public.ss --clean --if-exists -h localhost -d reario_db --role=reario | /usr/bin/psql -U reario -d reario_db -h $HOST -p 5432
 
@@ -42,4 +44,6 @@ echo "dumping view event_distribution_old...."
 /usr/bin/pg_dump -t public.event_distribution_old --clean --if-exists -h localhost -d reario_db --role=reario | /usr/bin/psql -U reario -d reario_db -h $HOST -p 5432
 echo "dumping view ToOn...."
 /usr/bin/pg_dump -t public.MaxDailyOn --clean --if-exists -h localhost -d reario_db --role=reario | /usr/bin/psql -U reario -d reario_db -h $HOST -p 5432
+echo "dumping view NightScatti...."
+/usr/bin/pg_dump -t public.nightscatti --clean --if-exists -h localhost -d reario_db --role=reario | /usr/bin/psql -U reario -d reario_db -h $HOST -p 5432
 ######################################################################
