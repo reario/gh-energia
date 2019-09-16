@@ -128,14 +128,10 @@ int main (int argc, char ** argv) {
   }
 
   mb = modbus_new_tcp("192.168.1.157",PORT);
-  //    mb = modbus_new_tcp( (char*)inet_ntoa( *( struct in_addr*)( hp -> h_addr_list[0])), PORT);
-  //    mb = modbus_new_tcp( "192.168.1.157", PORT);
-#ifdef OTB
   mb_otb = modbus_new_tcp("192.168.1.11",PORT);
-#endif
-
   attron(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
   /* faccio la connessione */
+<<<<<<< HEAD
   if ( (modbus_connect(mb) == -1) 
 #ifdef OTB	 
        || (modbus_connect(mb_otb) == -1) 
@@ -165,11 +161,19 @@ int main (int argc, char ** argv) {
 	   (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0) 
 #ifdef OTB
 	   ||
+=======
+  while (cont) {
+    if ( (modbus_connect(mb) == 0)  && (modbus_connect(mb_otb) == 0) )
+      {
+	attroff(COLOR_PAIR(1));mvprintw(0,col-4,"C");refresh();
+	attron(COLOR_PAIR(1));mvprintw(1,col-4,"R");refresh();	
+	/* leggo stato degli ingressi e i dati del PM9*/
+	/* || (modbus_read_registers(mb, 75, 1, tab_reg+68) < 0) */
+	if ( (modbus_read_registers(mb, addr, nregs, tab_reg) < 0) || 
+	     (modbus_read_registers(mb, 507, 2, tab_reg+69) < 0) ||
+>>>>>>> fa614ed19fef7f111cdb3e2edec7fc6bd330d39a
 	   (modbus_read_registers(mb_otb, 0, 3, otb_in) < 0) ||
-	   (modbus_read_registers(mb_otb, 100, 3, otb_out) < 0)
-#endif
-	     
-      ) 
+	   (modbus_read_registers(mb_otb, 100, 3, otb_out) < 0)    ) 
 	{
 	  attroff(COLOR_PAIR(1));
 	  attron(COLOR_PAIR(3));
@@ -179,8 +183,7 @@ int main (int argc, char ** argv) {
 	  ERRORI=ERRORI+1;
 	  mvprintw(1,col-3,"%d",ERRORI);
 	  mvprintw(2,col-23,"%s\n",modbus_strerror(errno));
-	  refresh();
-	} else { /* non ci sono stati errori di comunicazione e di lettura */
+	  refresh();	} else { /* non ci sono stati errori di comunicazione e di lettura */
 	  attroff(COLOR_PAIR(1));mvprintw(1,col-4,"R");refresh();
 	  /******************/
 	  /* calcolo V,A,kW */
@@ -260,8 +263,6 @@ int main (int argc, char ** argv) {
 	  mvprintw(6,26,"P-");
 	  attroff(A_BOLD);
 	  mvprintw(6,28,"parziale cancello");
-
-#ifdef OTB
 	  /* Fari LED esterni SOPRA */
 	  attron(A_BOLD);
 	  mvprintw(7,26,"R-");
@@ -289,8 +290,6 @@ int main (int argc, char ** argv) {
 	    mvprintw(8,28,"fari esterni SOTTO");
 	    attroff(COLOR_PAIR(0));
 	  }
-#endif
-
 	  refresh();
 	  ch=getch();
 	  switch (ch) {
@@ -338,7 +337,10 @@ int main (int argc, char ** argv) {
 	    if ( pulsante(mb,APERTURA_PARZIALE) !=0) {
 	      cont=0;  }
 	    break;
+<<<<<<< HEAD
 #ifdef OTB
+=======
+>>>>>>> fa614ed19fef7f111cdb3e2edec7fc6bd330d39a
 	  case 'r':
 	    if ( interruttore(mb_otb,FARI_ESTERNI_SOPRA,otb_out[0]) !=0) {
 	      cont=0;  }
@@ -347,11 +349,11 @@ int main (int argc, char ** argv) {
 	    if ( interruttore(mb_otb,FARI_ESTERNI_SOTTO,otb_out[0]) !=0) {
 	      cont=0;  }
 	    break;
-#endif
 	  case 'q':
 	    cont=0;
 	    break;
 	  }
+<<<<<<< HEAD
 	} /* else interno che wrappa il read_register */
  } /* else esterno che wrappa il connect*/
       
@@ -366,6 +368,25 @@ int main (int argc, char ** argv) {
     refresh();
     delwin(energia);
     endwin();      
+=======
+	}
+	usleep(300000);
+	modbus_close(mb);
+	//	modbus_free(mb);
+	modbus_close(mb_otb);
+	//modbus_free(mb_otb);
+      } else {
+	modbus_close(mb);
+	modbus_close(mb_otb);
+	
+    }
+    
+  }
+  //  delwin(energia);
+  refresh();
+  endwin();      
+>>>>>>> fa614ed19fef7f111cdb3e2edec7fc6bd330d39a
 
+  
   return 0;
 }
